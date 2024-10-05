@@ -1,17 +1,21 @@
 import base64
 import os
 import urllib.request
+import urllib
 from functools import partial
 
 import httpx
-from PySide6 import QtWidgets
-from PySide6.QtCore import QUrl
+import requests
+from PySide6 import QtWidgets, QtCore, QtGui
+from PySide6.QtCore import QUrl, QSize
+from PySide6.QtGui import QPixmap, Qt
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PySide6.QtWidgets import QSizePolicy
 
 from loguru import logger
 
 from src.settings.thread_manager import ThreadManager
-from src.ui.music.music_widget_uii import MusicWidgetUi
+from src.ui.music.music_widget_ui import MusicWidgetUi
 
 
 class MusicWidget(QtWidgets.QWidget, ThreadManager):
@@ -24,6 +28,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.media_player = QMediaPlayer()
         self.audio_output = QAudioOutput()
         self.media_player.setAudioOutput(self.audio_output)
+        self.cover_pixmap = QPixmap()
 
         self.ui = MusicWidgetUi()
         self.ui.setupUi(self)
@@ -39,35 +44,21 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.resume_button.setText(self.tr("Resume music"))
         self.ui.music_title.setText("Music title")
         self.ui.music_authors.setText("Music authors")
+        self.ui.image_label.setText("")
         self.ui.music_duration.setText("00:00")
         self.ui.current_music_time.setText("00:00")
-        # self.ui.music_duration.hide()
-        # self.ui.current_music_time.hide()
         self.ui.stop_button.hide()
         self.ui.resume_button.hide()
 
     @logger.catch
     def connect_sliders_etc(self) -> None:
         """Привязка слайдеров/текста и тд к функциям и сигналам"""
-        # self.ui.time_slider.sliderPressed.connect(self.show_duration_labels)
         self.ui.valume_slider.setValue(50)
         self.ui.valume_slider.valueChanged.connect(self.change_volume)
         self.ui.time_slider.sliderMoved.connect(self.change_time_position)
         self.ui.play_button.clicked.connect(self.play_music)
         self.ui.stop_button.clicked.connect(self.stop_music)
         self.ui.resume_button.clicked.connect(self.resume_music)
-
-    # @logger.catch
-    # def show_duration_labels(self):
-    #     """Отображение времени воспроизведения и длительности трека"""
-    #     music_duration_status = self.ui.music_duration.isHidden()
-    #     current_music_time_status = self.ui.current_music_time.isHidden()
-    #     if music_duration_status is True and current_music_time_status is True:
-    #         self.ui.music_duration.show()
-    #         self.ui.current_music_time.show()
-    #     else:
-    #         self.ui.music_duration.hide()
-    #         self.ui.current_music_time.hide()
 
     @logger.catch
     def get_music_duration(self, time) -> float:
@@ -126,15 +117,27 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         logger.info(f"{self.set_label_duration.__name__} - started in thread")
 
     @logger.catch
-    def make_response(self) -> dict | None:
+    def set_cover_image(self, cover: str) -> None:
+        """Установка обложки трека"""
+        cover_data = requests.get(cover)
+        self.cover_pixmap.loadFromData(cover_data.content)
+        self.ui.image_label.setFixedWidth(120)
+        self.ui.image_label.setFixedHeight(120)
+        self.ui.image_label.setPixmap(self.cover_pixmap)
+
+    @logger.catch
+    def make_response(self, music_title: str) -> dict | None:
         """Запрос к API"""
         try:
-            response = httpx.get("http://127.0.0.1:7000/music/find_music/?music_id=16").json()
-            data = response["file_url"]
-            duration = response["duration"]
-            title = response["title"]
-            authors = response["authors"]
-            return {"data": data, "duration": duration, "title": title, "authors": authors}
+            response = httpx.get(f"http://127.0.0.1:7000/music/find_music/?music_title={music_title}").json()
+            for i in response:
+                file = i["file_url"]
+                duration = i["duration"]
+                title = i["title"]
+                authors = i["authors"]
+                cover = i["cover_url"]
+                return {"file": file, "duration": duration, "title": title, "authors": authors,
+                        "cover": cover}
         except httpx.ConnectError as httpx_error:
             logger.error(f"{self.decode_music.__name__} - {httpx_error}")
             return None
@@ -156,18 +159,20 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.music_authors.setText(string)
 
     @logger.catch
-    def decode_music(self) -> float:
+    def decode_music(self, music_title: str) -> float:
         """Декодирование музыки"""
-        response = self.make_response()
+        response = self.make_response(music_title)
         if not response:
             return None
         title = response.get("title")
         self.set_title(title)
         authors = response.get("authors")
         self.set_authors(authors)
-        data = response.get("data")
+        music_file = response.get("file")
         duration = response.get("duration")
-        urllib.request.urlretrieve(data, "encoded.mp3")
+        cover = response.get("cover")
+        self.set_cover_image(cover)
+        urllib.request.urlretrieve(music_file, "encoded.mp3")
         with open("decoded.mp3", "wb+") as file, open("encoded.mp3", "rb") as api_file:
             api_data = api_file.read()
             decoded_data = base64.b64decode(api_data)
@@ -176,9 +181,9 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         return duration
 
     @logger.catch
-    def play_music(self) -> None:
+    def play_music(self, music_title: str) -> None:
         """Запуск проигрывателя"""
-        duration = self.decode_music()
+        duration = self.decode_music(music_title)
         if not duration:
             return None
         self.media_player.setSource(QUrl.fromLocalFile("decoded.mp3"))

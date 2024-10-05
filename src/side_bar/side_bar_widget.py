@@ -12,6 +12,4 @@ class SideBarWidget(QtWidgets.QWidget):
         super().__init__()
         self.ui = UiSideBarWidget()
         self.ui.setupUi(self)
-
-
-# 800 600
+        self.ui.search_button.setText(self.tr("search"))

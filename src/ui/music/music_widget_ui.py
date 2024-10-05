@@ -23,7 +23,7 @@ class MusicWidgetUi(object):
     def setupUi(self, music_play_widget):
         if not music_play_widget.objectName():
             music_play_widget.setObjectName(u"music_play_widget")
-        music_play_widget.resize(389, 373)
+        music_play_widget.resize(690, 373)
         self.gridLayout_2 = QGridLayout(music_play_widget)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.main_layout = QGridLayout()
@@ -40,7 +40,7 @@ class MusicWidgetUi(object):
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.horizontalSpacer_6 = QSpacerItem(170, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer_6 = QSpacerItem(170, 20, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_6)
 
@@ -70,9 +70,6 @@ class MusicWidgetUi(object):
         self.horizontalLayout_5.addWidget(self.play_button)
         self.horizontalLayout_5.addWidget(self.stop_button)
         self.horizontalLayout_5.addWidget(self.resume_button)
-        self.horizontalLayout_5.addWidget(self.play_button)
-
-        self.horizontalLayout_5.addWidget(self.play_button)
 
         self.horizontalSpacer_8 = QSpacerItem(60, 20, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
 
@@ -126,6 +123,11 @@ class MusicWidgetUi(object):
 
         self.time_duration_layout = QHBoxLayout()
         self.time_duration_layout.setObjectName(u"time_duration_layout")
+        self.image_label = QLabel(music_play_widget)
+        self.image_label.setObjectName(u"image_label")
+
+        self.time_duration_layout.addWidget(self.image_label)
+
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.music_title = QLabel(music_play_widget)
@@ -204,6 +206,7 @@ class MusicWidgetUi(object):
     def retranslateUi(self, music_play_widget):
         music_play_widget.setWindowTitle(QCoreApplication.translate("music_play_widget", u"Form", None))
         self.play_button.setText(QCoreApplication.translate("music_play_widget", u"PushButton", None))
+        self.image_label.setText(QCoreApplication.translate("music_play_widget", u"TextLabel", None))
         self.music_title.setText(QCoreApplication.translate("music_play_widget", u"TextLabel", None))
         self.music_authors.setText(QCoreApplication.translate("music_play_widget", u"TextLabel", None))
         self.current_music_time.setText(QCoreApplication.translate("music_play_widget", u"TextLabel", None))
