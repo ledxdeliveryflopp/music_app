@@ -6,16 +6,15 @@ from functools import partial
 
 import httpx
 import requests
-from PySide6 import QtWidgets, QtCore, QtGui
-from PySide6.QtCore import QUrl, QSize
-from PySide6.QtGui import QPixmap, Qt
+from PySide6 import QtWidgets
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QPixmap
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
-from PySide6.QtWidgets import QSizePolicy
 
 from loguru import logger
 
+from src.music.widget_ui import MusicWidgetUi
 from src.settings.thread_manager import ThreadManager
-from src.ui.music.music_widget_ui import MusicWidgetUi
 
 
 class MusicWidget(QtWidgets.QWidget, ThreadManager):
@@ -49,6 +48,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.current_music_time.setText("00:00")
         self.ui.stop_button.hide()
         self.ui.resume_button.hide()
+        logger.info(f"{self.translate_ui.__name__} - inited")
 
     @logger.catch
     def connect_sliders_etc(self) -> None:
@@ -59,6 +59,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.play_button.clicked.connect(self.play_music)
         self.ui.stop_button.clicked.connect(self.stop_music)
         self.ui.resume_button.clicked.connect(self.resume_music)
+        logger.info(f"{self.connect_sliders_etc.__name__} - inited")
 
     @logger.catch
     def get_music_duration(self, time) -> float:

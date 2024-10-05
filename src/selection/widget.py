@@ -1,10 +1,10 @@
-from PySide6 import QtWidgets, QtCore
-from PySide6.QtGui import QMovie
+from PySide6 import QtWidgets
 
-from src.ui.selection.selection_widget_ui import SelectionWidgetUi
+from src.selection.widget_ui import SelectionWidgetUi
 
 
 class SelectionWidget(QtWidgets.QWidget):
+    """Виджет рекомендация и тд(в данный момент заглушка)"""
 
     def __init__(self):
         super().__init__()

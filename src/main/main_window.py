@@ -16,6 +16,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(self.main_widget)
 
     def closeEvent(self, event):
+        """Удаление музыки при выключении приложения"""
         try:
             self.main_widget.ui.music_widget.media_player.setSource("")
             os.remove("decoded.mp3")

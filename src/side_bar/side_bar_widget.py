@@ -2,11 +2,11 @@
 
 from PySide6 import QtWidgets
 
-from src.ui.side_bar.side_bar_widget_ui import UiSideBarWidget
+from src.side_bar.widget_ui import UiSideBarWidget
 
 
 class SideBarWidget(QtWidgets.QWidget):
-    """Виджет музыки"""
+    """Виджет бокового меню"""
 
     def __init__(self):
         super().__init__()

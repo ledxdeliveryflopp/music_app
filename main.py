@@ -16,6 +16,7 @@ def start_app() -> None:
 if __name__ == "__main__":
     logger.add("application.log", rotation="100 MB",
                format="{time:DD-MM-YYYY at HH:mm:ss} | {level} | {message}")
+    logger.info(f"application started")
     start_app()
 
 

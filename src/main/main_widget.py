@@ -4,8 +4,8 @@ from PySide6.QtCore import QModelIndex
 from PySide6.QtWidgets import QVBoxLayout, QAbstractItemView
 from loguru import logger
 
+from src.main.widget_ui import MainWidgetUi
 from src.search.widget import SearchWidget
-from src.ui.main.main_widget_ui import MainWidgetUi
 
 
 class MainWidget(QtWidgets.QWidget):
@@ -13,18 +13,29 @@ class MainWidget(QtWidgets.QWidget):
 
     def __init__(self):
         super().__init__()
+        self.model = None
+        self.search_widget = None
         self.ui = MainWidgetUi()
         self.ui.setupUi(self)
-        self.ui.side_bar_widget.ui.search_button.clicked.connect(self.open_search_widget)
-
+        self.init_model_and_search_widget()
+        self.set_signals()
+       
+    @logger.catch
+    def init_model_and_search_widget(self) -> None:
+        """инициализация модели и виджета поиска"""
         self.search_widget = SearchWidget()
-        self.search_widget.ui.search_input.textChanged.connect(self.set_music_to_list)
-
         self.model = QtGui.QStandardItemModel()
         self.search_widget.ui.listView.setModel(self.model)
+        logger.info(f"{self.init_model_and_search_widget.__name__} - inited")
+    
+    @logger.catch
+    def set_signals(self) -> None:
+        """Установка сигналов"""
+        self.search_widget.ui.search_input.textChanged.connect(self.set_music_to_list)
+        self.ui.side_bar_widget.ui.search_button.clicked.connect(self.open_search_widget)
         self.search_widget.ui.listView.setEditTriggers(QAbstractItemView.NoEditTriggers)
-
         self.search_widget.ui.listView.pressed.connect(self.play_music_in_music_widget)
+        logger.info(f"{self.set_signals.__name__} - inited")
 
     @logger.catch
     def play_music_in_music_widget(self, index: QModelIndex):
