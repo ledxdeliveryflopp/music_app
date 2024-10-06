@@ -6,8 +6,8 @@ from functools import partial
 
 import httpx
 import requests
-from PySide6 import QtWidgets
-from PySide6.QtCore import QUrl
+from PySide6 import QtWidgets, QtCore
+from PySide6.QtCore import QUrl, QSize, Qt
 from PySide6.QtGui import QPixmap
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 
@@ -22,7 +22,8 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
 
     def __init__(self):
         super().__init__()
-        self.duration = None
+        self.duration: float = None
+        self.current_music_id: int = None
 
         self.media_player = QMediaPlayer()
         self.audio_output = QAudioOutput()
@@ -41,8 +42,9 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.play_button.setText(self.tr("Play music"))
         self.ui.stop_button.setText(self.tr("Pause music"))
         self.ui.resume_button.setText(self.tr("Resume music"))
-        self.ui.music_title.setText("Music title")
-        self.ui.music_authors.setText("Music authors")
+        self.ui.music_title.setText("")
+        self.ui.music_authors.setText("")
+        self.ui.add_favorite_button.setText("add to fav")
         self.ui.image_label.setText("")
         self.ui.music_duration.setText("00:00")
         self.ui.current_music_time.setText("00:00")
@@ -59,6 +61,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.play_button.clicked.connect(self.play_music)
         self.ui.stop_button.clicked.connect(self.stop_music)
         self.ui.resume_button.clicked.connect(self.resume_music)
+        self.ui.add_favorite_button.clicked.connect(self.add_to_favorite)
         logger.info(f"{self.connect_sliders_etc.__name__} - inited")
 
     @logger.catch
@@ -122,9 +125,9 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         """Установка обложки трека"""
         cover_data = requests.get(cover)
         self.cover_pixmap.loadFromData(cover_data.content)
-        self.ui.image_label.setFixedWidth(120)
-        self.ui.image_label.setFixedHeight(120)
-        self.ui.image_label.setPixmap(self.cover_pixmap)
+        scaled_cover = self.cover_pixmap.scaled(120, 120, Qt.KeepAspectRatio, Qt.FastTransformation)
+        self.ui.image_label.setPixmap(scaled_cover)
+        self.ui.image_label.setScaledContents(False)
 
     @logger.catch
     def make_response(self, music_title: str) -> dict | None:
@@ -137,6 +140,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
                 title = i["title"]
                 authors = i["authors"]
                 cover = i["cover_url"]
+                self.current_music_id = i["id"]
                 return {"file": file, "duration": duration, "title": title, "authors": authors,
                         "cover": cover}
         except httpx.ConnectError as httpx_error:
@@ -220,3 +224,14 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.media_player.play()
         self.ui.resume_button.hide()
         self.ui.stop_button.show()
+
+    @logger.catch
+    def add_to_favorite(self) -> None:
+        """Добавление в избранное"""
+        try:
+            response = httpx.patch(f"http://127.0.0.1:7000/music/add_to_fav/?user_id=3&music_id="
+                                   f"{self.current_music_id}")
+            if response.status_code != 200:
+                logger.info(f"response json - {response.json()}")
+        except Exception as exception:
+            logger.error(f"{self.add_to_favorite.__name__} exception - {exception}")

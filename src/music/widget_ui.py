@@ -23,7 +23,7 @@ class MusicWidgetUi(object):
     def setupUi(self, music_play_widget):
         if not music_play_widget.objectName():
             music_play_widget.setObjectName(u"music_play_widget")
-        music_play_widget.resize(690, 373)
+        music_play_widget.resize(604, 373)
         self.gridLayout_2 = QGridLayout(music_play_widget)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.main_layout = QGridLayout()
@@ -147,6 +147,11 @@ class MusicWidgetUi(object):
 
         self.time_duration_layout.addLayout(self.verticalLayout)
 
+        self.add_favorite_button = QPushButton(music_play_widget)
+        self.add_favorite_button.setObjectName(u"add_favorite_button")
+
+        self.time_duration_layout.addWidget(self.add_favorite_button)
+
         self.horizontalSpacer = QSpacerItem(10, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.time_duration_layout.addItem(self.horizontalSpacer)
@@ -198,18 +203,7 @@ class MusicWidgetUi(object):
         self.gridLayout_2.addLayout(self.main_layout, 1, 0, 1, 1)
 
 
-        self.retranslateUi(music_play_widget)
 
         QMetaObject.connectSlotsByName(music_play_widget)
     # setupUi
-
-    def retranslateUi(self, music_play_widget):
-        music_play_widget.setWindowTitle(QCoreApplication.translate("music_play_widget", u"Form", None))
-        self.play_button.setText(QCoreApplication.translate("music_play_widget", u"PushButton", None))
-        self.image_label.setText(QCoreApplication.translate("music_play_widget", u"TextLabel", None))
-        self.music_title.setText(QCoreApplication.translate("music_play_widget", u"TextLabel", None))
-        self.music_authors.setText(QCoreApplication.translate("music_play_widget", u"TextLabel", None))
-        self.current_music_time.setText(QCoreApplication.translate("music_play_widget", u"TextLabel", None))
-        self.music_duration.setText(QCoreApplication.translate("music_play_widget", u"TextLabel", None))
-    # retranslateUi
 
