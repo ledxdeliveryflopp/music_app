@@ -3,11 +3,14 @@ from loguru import logger
 from PySide6 import QtWidgets
 
 from src.main.main_window import MainWindow
+from src.tray.widget import TrayWidget
 
 
 def start_app() -> None:
     app = QtWidgets.QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
     window = MainWindow()
+    tray = TrayWidget(app, window)
     app.setStyle('Windows')
     window.show()
     sys.exit(app.exec())
