@@ -125,7 +125,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         """Установка обложки трека"""
         cover_data = requests.get(cover)
         self.cover_pixmap.loadFromData(cover_data.content)
-        scaled_cover = self.cover_pixmap.scaled(120, 120, Qt.KeepAspectRatio, Qt.FastTransformation)
+        scaled_cover = self.cover_pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.FastTransformation)
         self.ui.image_label.setPixmap(scaled_cover)
         self.ui.image_label.setScaledContents(False)
 
