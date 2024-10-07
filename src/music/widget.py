@@ -133,16 +133,15 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
     def make_response(self, music_title: str) -> dict | None:
         """Запрос к API"""
         try:
-            response = httpx.get(f"http://127.0.0.1:7000/music/find_music/?music_title={music_title}").json()
-            for i in response:
-                file = i["file_url"]
-                duration = i["duration"]
-                title = i["title"]
-                authors = i["authors"]
-                cover = i["cover_url"]
-                self.current_music_id = i["id"]
-                return {"file": file, "duration": duration, "title": title, "authors": authors,
-                        "cover": cover}
+            response = httpx.get(f"http://127.0.0.1:7000/music/play_music/?title={music_title}").json()
+            file = response.get("file_url")
+            duration = response.get("duration")
+            title = response.get("title")
+            authors = response.get("authors")
+            cover = response.get("cover_url")
+            self.current_music_id = response.get("id")
+            return {"file": file, "duration": duration, "title": title, "authors": authors,
+                    "cover": cover}
         except httpx.ConnectError as httpx_error:
             logger.error(f"{self.decode_music.__name__} - {httpx_error}")
             return None
