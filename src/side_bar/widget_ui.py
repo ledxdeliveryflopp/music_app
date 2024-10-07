@@ -59,12 +59,12 @@ class UiSideBarWidget(object):
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.stream_button = QPushButton(Form)
-        self.stream_button.setObjectName(u"stream_button")
-        sizePolicy1.setHeightForWidth(self.stream_button.sizePolicy().hasHeightForWidth())
-        self.stream_button.setSizePolicy(sizePolicy1)
+        self.upload_music_button = QPushButton(Form)
+        self.upload_music_button.setObjectName(u"upload_music_button")
+        sizePolicy1.setHeightForWidth(self.upload_music_button.sizePolicy().hasHeightForWidth())
+        self.upload_music_button.setSizePolicy(sizePolicy1)
 
-        self.verticalLayout.addWidget(self.stream_button)
+        self.verticalLayout.addWidget(self.upload_music_button)
 
 
         self.verticalLayout_2.addLayout(self.verticalLayout)
@@ -101,17 +101,6 @@ class UiSideBarWidget(object):
         self.verticalLayout_2.addLayout(self.verticalLayout_5)
 
 
-        self.retranslateUi(Form)
 
         QMetaObject.connectSlotsByName(Form)
-    # setupUi
-
-    def retranslateUi(self, Form):
-        Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
-        self.search_button.setText(QCoreApplication.translate("Form", u"PushButton", None))
-        self.main_window_button.setText(QCoreApplication.translate("Form", u"PushButton", None))
-        self.stream_button.setText(QCoreApplication.translate("Form", u"PushButton", None))
-        self.playlist_button.setText(QCoreApplication.translate("Form", u"PushButton", None))
-        self.username_label.setText(QCoreApplication.translate("Form", u"TextLabel", None))
-    # retranslateUi
 
