@@ -79,6 +79,8 @@ class SearchWidget(QtWidgets.QWidget, ThreadManager):
     def set_music_to_list(self, query) -> None:
         """Добавить музыку в список"""
         data = self.search_music(query)
+        row_count = self.model.rowCount()
+        self.model.removeRows(0, row_count)
         try:
             for music_info in data:
                 cover_url = music_info.get("cover_url")
@@ -93,11 +95,6 @@ class SearchWidget(QtWidgets.QWidget, ThreadManager):
                 self.delete_duplicate(title_author)
         except Exception as exc:
             logger.info(f"{self.set_music_to_list.__name__} exception - {exc}")
-            if self.ui.search_input.text() == "":
-                row_count = self.model.rowCount()
-                self.model.removeRows(0, row_count)
-            else:
-                pass
 
     @logger.catch
     def delete_duplicate(self, title_author: str) -> None:
