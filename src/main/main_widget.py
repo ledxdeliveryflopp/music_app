@@ -34,6 +34,7 @@ class MainWidget(QtWidgets.QWidget):
 
     @logger.catch
     def open_search_widget(self) -> None:
+        """Установка виджета поиска"""
         self.ui.selection_widget.hide()
         self.ui.main_window_layout = QVBoxLayout(self.search_widget)
         self.ui.gridLayout_2.addWidget(self.search_widget, 1, 1, 1, 1)
