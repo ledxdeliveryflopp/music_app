@@ -35,22 +35,30 @@ class TrayWidget(QtWidgets.QSystemTrayIcon):
     def init_menu(self) -> None:
         """Инициализация меню треи"""
         self.menu = QMenu()
-        self.quit_action = QAction(self.tr("Close app"))
         self.open_action = QAction(self.tr("Open app"))
-        self.menu.addAction(self.quit_action)
+        self.quit_action = QAction(self.tr("Close app"))
         self.menu.addAction(self.open_action)
+        self.menu.addAction(self.quit_action)
 
     @logger.catch
     def set_signals(self) -> None:
         """Установка сигналов"""
+        self.activated.connect(self.open_app_by_double_click)
         self.quit_action.triggered.connect(self.close_app)
-        self.open_action.triggered.connect(self.open_app)
+        self.open_action.triggered.connect(self.open_app_by_button)
 
     @logger.catch
-    def open_app(self) -> None:
-        """Открыть приложение"""
+    def open_app_by_double_click(self, reason) -> None:
+        """Открыть приложение по двойному нажатию"""
+        if reason == self.ActivationReason.DoubleClick:
+            self.main_window.show()
+            logger.info(f"app reopen by 2x click")
+
+    @logger.catch
+    def open_app_by_button(self) -> None:
+        """Открыть приложение по кнопке"""
         self.main_window.show()
-        logger.info(f"app reopen")
+        logger.info(f"app reopen by button")
 
     @logger.catch
     def close_app(self) -> None:
