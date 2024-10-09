@@ -6,14 +6,14 @@ from functools import partial
 
 import httpx
 import requests
-from PySide6 import QtWidgets, QtCore
-from PySide6.QtCore import QUrl, QSize, Qt
+from PySide6 import QtWidgets
+from PySide6.QtCore import QUrl, Qt
 from PySide6.QtGui import QPixmap
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 
 from loguru import logger
 
-from src.music.widget_ui import MusicWidgetUi
+from src.music.widget_ui import Ui_Music_widget
 from src.settings.thread_manager import ThreadManager
 
 
@@ -30,7 +30,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.media_player.setAudioOutput(self.audio_output)
         self.cover_pixmap = QPixmap()
 
-        self.ui = MusicWidgetUi()
+        self.ui = Ui_Music_widget()
         self.ui.setupUi(self)
 
         self.translate_ui()
@@ -42,12 +42,12 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.play_button.setText(self.tr("Play music"))
         self.ui.stop_button.setText(self.tr("Pause music"))
         self.ui.resume_button.setText(self.tr("Resume music"))
+        self.ui.loop_button.setText(self.tr("Loop"))
         self.ui.music_title.setText("")
-        self.ui.music_authors.setText("")
-        self.ui.add_favorite_button.setText("add to fav")
-        self.ui.image_label.setText("")
+        self.ui.authors_label.setText("")
+        self.ui.music_cover.setText("")
         self.ui.music_duration.setText("00:00")
-        self.ui.current_music_time.setText("00:00")
+        self.ui.current_duration.setText("00:00")
         self.ui.stop_button.hide()
         self.ui.resume_button.hide()
         logger.info(f"{self.translate_ui.__name__} - inited")
@@ -57,12 +57,20 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         """Привязка слайдеров/текста и тд к функциям и сигналам"""
         self.ui.valume_slider.setValue(50)
         self.ui.valume_slider.valueChanged.connect(self.change_volume)
-        self.ui.time_slider.sliderMoved.connect(self.change_time_position)
-        self.ui.play_button.clicked.connect(self.play_music)
+        self.ui.music_duration_slider.sliderMoved.connect(self.change_time_position)
+        # self.ui.play_button.clicked.connect(self.play_music)
         self.ui.stop_button.clicked.connect(self.stop_music)
         self.ui.resume_button.clicked.connect(self.resume_music)
-        self.ui.add_favorite_button.clicked.connect(self.add_to_favorite)
+        self.ui.loop_button.setCheckable(True)
+        self.ui.loop_button.clicked.connect(self.set_loop)
         logger.info(f"{self.connect_sliders_etc.__name__} - inited")
+
+    @logger.catch
+    def set_loop(self) -> None:
+        if self.ui.loop_button.isChecked() is True:
+            self.enable_loop()
+        else:
+            self.disable_loop()
 
     @logger.catch
     def get_music_duration(self, time) -> float:
@@ -76,7 +84,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         """Установить длительность трека для слайдера"""
         logger.info(f"{self.set_time_slider_duration.__name__} - started in thread")
         duration = self.get_music_duration(time)
-        self.ui.time_slider.setMaximum(duration)
+        self.ui.music_duration_slider.setMaximum(duration)
         logger.info(f"{self.set_time_slider_duration.__name__} - stoped in thread")
 
     @logger.catch
@@ -94,13 +102,13 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
     @logger.catch
     def change_slider(self, position) -> None:
         """Изменение слайдера при проигровании музыки"""
-        self.ui.time_slider.setValue(position)
+        self.ui.music_duration_slider.setValue(position)
 
     @logger.catch
     def change_time_position(self, position) -> None:
         """Изменить место воспроизвидения"""
-        if self.ui.time_slider.value() != self.media_player.position():
-            self.media_player.setPosition(self.ui.time_slider.value())
+        if self.ui.music_duration_slider.value() != self.media_player.position():
+            self.media_player.setPosition(self.ui.music_duration_slider.value())
         else:
             pass
 
@@ -108,7 +116,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
     def set_current_music_duration(self, position) -> None:
         """Установка текущего времени воспроизведения для текста"""
         time = position / 60000
-        self.ui.current_music_time.setText(f"{'%.2f'%time}")
+        self.ui.current_duration.setText(f"{'%.2f' % time}")
 
     @logger.catch
     def set_label_duration(self, time) -> None:
@@ -126,14 +134,15 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         cover_data = requests.get(cover)
         self.cover_pixmap.loadFromData(cover_data.content)
         scaled_cover = self.cover_pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.FastTransformation)
-        self.ui.image_label.setPixmap(scaled_cover)
-        self.ui.image_label.setScaledContents(False)
+        self.ui.music_cover.setPixmap(scaled_cover)
+        self.ui.music_cover.setScaledContents(False)
 
     @logger.catch
     def make_response(self, music_title: str) -> dict | None:
         """Запрос к API"""
         try:
-            response = httpx.get(f"http://127.0.0.1:7000/music/play_music/?title={music_title}").json()
+            response = httpx.get(
+                f"http://127.0.0.1:7000/music/play_music/?title={music_title}").json()
             file = response.get("file_url")
             duration = response.get("duration")
             title = response.get("title")
@@ -160,7 +169,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
                 string = string + f"{username}"
             else:
                 string = string + f"{username}, "
-        self.ui.music_authors.setText(string)
+        self.ui.authors_label.setText(string)
 
     @logger.catch
     def decode_music(self, music_title: str) -> float:
@@ -194,12 +203,24 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.thread_manager.start(partial(self.set_time_slider_duration, duration))
         self.thread_manager.start(partial(self.set_label_duration, duration))
         self.media_player.positionChanged.connect(self.change_slider)
-        self.ui.time_slider.valueChanged.connect(self.change_time_position)
+        self.ui.music_duration_slider.valueChanged.connect(self.change_time_position)
         self.media_player.positionChanged.connect(self.set_current_music_duration)
         self.ui.play_button.hide()
         self.ui.stop_button.show()
         self.set_volume()
         self.media_player.play()
+
+    @logger.catch
+    def enable_loop(self) -> None:
+        """Старт трека после его окончания(повтор)"""
+        self.media_player.setLoops(QMediaPlayer.Infinite)
+        logger.info(f"loop on")
+
+    @logger.catch
+    def disable_loop(self) -> None:
+        """Отключение повтора трека"""
+        self.media_player.setLoops(1)
+        logger.info(f"loop off")
 
     @logger.catch
     def stop_music(self) -> None:
@@ -223,14 +244,3 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.media_player.play()
         self.ui.resume_button.hide()
         self.ui.stop_button.show()
-
-    @logger.catch
-    def add_to_favorite(self) -> None:
-        """Добавление в избранное"""
-        try:
-            response = httpx.patch(f"http://127.0.0.1:7000/music/add_to_fav/?user_id=3&music_id="
-                                   f"{self.current_music_id}")
-            if response.status_code != 200:
-                logger.info(f"response json - {response.json()}")
-        except Exception as exception:
-            logger.error(f"{self.add_to_favorite.__name__} exception - {exception}")

@@ -8,23 +8,21 @@ from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QAbstractItemView
 from loguru import logger
 
-from src.music.widget import MusicWidget
-from src.search.widget_ui import SearchWidgetUi
+from src.search.widget_ui import Ui_Search_widget
 from src.settings.thread_manager import ThreadManager
 
 
 class SearchWidget(QtWidgets.QWidget, ThreadManager):
     """Виджет поиска музыки"""
 
-    def __init__(self, music_widget: MusicWidget):
+    def __init__(self, music_widget):
         super().__init__()
         self.model = None
         self.music_widget = music_widget
-        self.ui = SearchWidgetUi()
+        self.ui = Ui_Search_widget()
         self.ui.setupUi(self)
         self.init_item_model()
         self.set_signals()
-        self.cover_pixmap = QPixmap()
 
     @logger.catch
     def init_item_model(self) -> None:
