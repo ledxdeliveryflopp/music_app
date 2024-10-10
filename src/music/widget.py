@@ -14,6 +14,7 @@ from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 from loguru import logger
 
 from src.music.widget_ui import Ui_Music_widget
+from src.settings.settings import ini_settings, settings
 from src.settings.thread_manager import ThreadManager
 
 
@@ -141,8 +142,12 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
     def make_response(self, music_id: int) -> dict | None:
         """Запрос к API"""
         try:
+            token_from_ini = ini_settings.get_auth_token_section()
+            decrypted_token = settings.crypt_settings.decrypt_data(token_from_ini)
+            token = f"Bearer {decrypted_token}"
             response = httpx.get(
-                f"http://127.0.0.1:7000/music/play_music/?music_id={music_id}").json()
+                f"http://127.0.0.1:7000/music/play_music/?music_id={music_id}",
+                headers={f"Authorization": token}).json()
             file = response.get("file_url")
             duration = response.get("duration")
             title = response.get("title")
@@ -151,8 +156,8 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
             self.current_music_id = response.get("id")
             return {"file": file, "duration": duration, "title": title, "authors": authors,
                     "cover": cover}
-        except httpx.ConnectError as httpx_error:
-            logger.error(f"{self.decode_music.__name__} - {httpx_error}")
+        except Exception as exception:
+            logger.error(f"{self.decode_music.__name__} - {exception}")
             return None
 
     @logger.catch

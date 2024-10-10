@@ -1,11 +1,14 @@
 import json
 import sys
+from datetime import datetime
 
 import httpx
 from PySide6 import QtWidgets
+from cryptography.fernet import Fernet
 from loguru import logger
 
 from src.authorization.widget_ui import Ui_authorization_widget
+from src.settings.settings import Settings, settings, ini_settings
 
 
 class AuthorizationWidget(QtWidgets.QWidget):
@@ -38,14 +41,14 @@ class AuthorizationWidget(QtWidgets.QWidget):
         self.ui.password_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
 
     @logger.catch
-    def create_token_in_config(self, token: str) -> None:
+    def create_token_in_config(self, token: str, expire: datetime) -> None:
         """Создание токена в конфиге"""
         try:
-            with open(f"config/token.json", "w") as file:
-                data = {"token": token}
-                json_data = json.dumps(data)
-                file.write(json_data)
-            logger.info(f"token written")
+            krypt = Fernet(settings.crypt_settings.cryptography_token)
+            byte_token = token.encode("utf-8")
+            krypt_token = krypt.encrypt(byte_token)
+            str_krypt_token = krypt_token.decode("utf-8")
+            ini_settings.change_auth_section(str_krypt_token, expire)
         except Exception as exception:
             logger.error(f"{self.create_token_in_config.__name__} error - {exception}")
 
@@ -58,8 +61,9 @@ class AuthorizationWidget(QtWidgets.QWidget):
         response_json = response.json()
         if response.status_code == 200:
             token = response_json.get("token")
+            expire = response_json.get("expire")
             self.status = True
-            self.create_token_in_config(token)
+            self.create_token_in_config(token, expire)
             self.close()
         else:
             logger.error(f"{self.authorization_request.__name__} json error - {response_json}")
