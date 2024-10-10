@@ -18,6 +18,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QGridLayout, QLayout, QMainWindow,
     QMenuBar, QSizePolicy, QVBoxLayout, QWidget)
 
+from src.authorization.widget import AuthorizationWidget
 from src.music.widget import MusicWidget
 from src.search.widget import SearchWidget
 from src.side_bar.widget import SideBarWidget
@@ -31,6 +32,7 @@ class Ui_MainWindow(object):
         MainWindow.setMaximumSize(QSize(1000, 492))
         # MainWindow.setMaximumSize(QSize(950, 148))
         self.centralwidget = QWidget(MainWindow)
+        self.authorization_widget = AuthorizationWidget(MainWindow)
         self.centralwidget.setMinimumSize(QSize(950, 148))
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_2 = QGridLayout(self.centralwidget)

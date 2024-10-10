@@ -34,8 +34,8 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QVBoxLayout" name="side_bar_layout">
-     <item alignment="|Qt::AlignmentFlag::AlignVCenter">
-      <widget class="QPushButton" name="search_button">
+     <item alignment="Qt::AlignmentFlag::Qt::AlignmentFlag::AlignVCenter">
+      <widget class="QPushButton" name="pushButton">
        <property name="text">
         <string>PushButton</string>
        </property>
