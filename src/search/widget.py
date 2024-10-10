@@ -53,6 +53,8 @@ class SearchWidget(QtWidgets.QWidget, ThreadManager):
     @logger.catch
     def search_music(self, query: str) -> list | None:
         """Поиск музыки по автору и названию"""
+        if len(self.ui.search_input.text()) < 4:
+            return None
         try:
             request = httpx.get(f"http://127.0.0.1:7000/music/find_music/?author_username="
                                 f"{query}&music_title={query}")
@@ -76,28 +78,22 @@ class SearchWidget(QtWidgets.QWidget, ThreadManager):
         """Добавить музыку в список"""
         data = self.search_music(query)
         row_count = self.model.rowCount()
+        logger.info(f"row count - {row_count}")
         self.model.removeRows(0, row_count)
+        print(data)
         try:
             for music_info in data:
                 music_id = music_info.get("id")
                 cover_url = music_info.get("cover_url")
                 title = music_info.get("title")
-                author_data = music_info.get("owner")
-                author = author_data.get("username")
-                title_author = f"{title}\n{author}"
+                authors_list = music_info.get("authors")
+                authors = ", ".join(authors_list)
+                title_author = f"{title}\n{authors}"
                 item = QtGui.QStandardItem(title_author)
                 item.setData(music_id)
                 icon = self.set_cover_to_music_in_list(cover_url)
                 item.setIcon(icon)
                 self.model.appendRow(item)
-                self.delete_duplicate(title_author)
+
         except Exception as exc:
             logger.info(f"{self.set_music_to_list.__name__} exception - {exc}")
-
-    @logger.catch
-    def delete_duplicate(self, title_author: str) -> None:
-        """Удаление дубликатов"""
-        item = self.model.findItems(title_author)
-        if len(item) > 1:
-            row = item[1].row()
-            self.model.removeRow(row)
