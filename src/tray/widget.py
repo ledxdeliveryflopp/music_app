@@ -10,10 +10,11 @@ from loguru import logger
 class TrayWidget(QtWidgets.QSystemTrayIcon):
     """Виджет треи"""
 
-    def __init__(self, app: QApplication, main_window: QMainWindow):
+    def __init__(self, app: QApplication, main_window: QMainWindow, media_player):
         super().__init__()
         self.app: QApplication = app
         self.main_window: QMainWindow = main_window
+        self.media_player = media_player
         self.quit_action: QAction = None
         self.open_action: QAction = None
         self.menu: QMenu = None
@@ -64,8 +65,9 @@ class TrayWidget(QtWidgets.QSystemTrayIcon):
     def close_app(self) -> None:
         """Закрыть приложение"""
         try:
+            self.media_player.stop()
+            self.media_player.setSource("")
             os.remove("decoded.mp3")
-            os.remove("encoded.mp3")
         except Exception as exc:
             logger.info(f"close main exception: {exc}")
         logger.info(f"app closed")

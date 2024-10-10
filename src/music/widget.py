@@ -58,7 +58,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.valume_slider.setValue(50)
         self.ui.valume_slider.valueChanged.connect(self.change_volume)
         self.ui.music_duration_slider.sliderMoved.connect(self.change_time_position)
-        # self.ui.play_button.clicked.connect(self.play_music)
+        # self.ui.play_button.clicked.connect(self.stream_music)
         self.ui.stop_button.clicked.connect(self.stop_music)
         self.ui.resume_button.clicked.connect(self.resume_music)
         self.ui.loop_button.setCheckable(True)
@@ -138,11 +138,11 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.music_cover.setScaledContents(False)
 
     @logger.catch
-    def make_response(self, music_title: str) -> dict | None:
+    def make_response(self, music_id: int) -> dict | None:
         """Запрос к API"""
         try:
             response = httpx.get(
-                f"http://127.0.0.1:7000/music/play_music/?title={music_title}").json()
+                f"http://127.0.0.1:7000/music/play_music/?music_id={music_id}").json()
             file = response.get("file_url")
             duration = response.get("duration")
             title = response.get("title")
@@ -172,9 +172,9 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.authors_label.setText(string)
 
     @logger.catch
-    def decode_music(self, music_title: str) -> float:
+    def decode_music(self, music_id: int) -> float:
         """Декодирование музыки"""
-        response = self.make_response(music_title)
+        response = self.make_response(music_id)
         if not response:
             return None
         title = response.get("title")
@@ -194,9 +194,9 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         return duration
 
     @logger.catch
-    def play_music(self, music_title: str) -> None:
+    def play_music(self, music_id: int) -> None:
         """Запуск проигрывателя"""
-        duration = self.decode_music(music_title)
+        duration = self.decode_music(music_id)
         if not duration:
             return None
         self.media_player.setSource(QUrl.fromLocalFile("decoded.mp3"))

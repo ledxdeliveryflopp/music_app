@@ -10,7 +10,7 @@ def start_app() -> None:
     app = QtWidgets.QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
     window = MainWindow()
-    tray = TrayWidget(app, window)
+    tray = TrayWidget(app, window, window.main_widget.ui.music_play_widget.media_player)
     app.setStyle('Windows')
     window.show()
     sys.exit(app.exec())

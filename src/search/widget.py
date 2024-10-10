@@ -42,10 +42,8 @@ class SearchWidget(QtWidgets.QWidget, ThreadManager):
     @logger.catch
     def play_music_in_music_widget(self, index: QModelIndex) -> None:
         music_data = self.ui.listView.model().itemFromIndex(index)
-        music_split = music_data.text().split("\n")
-        music_title = music_split[0]
-        logger.info(f"play_music_in_music_widget index - {music_split}")
-        self.music_widget.play_music(music_title)
+        music_id = music_data.data()
+        self.music_widget.play_music(music_id)
 
     @logger.catch
     def set_music_list_in_thread(self, query: str) -> None:
@@ -81,12 +79,14 @@ class SearchWidget(QtWidgets.QWidget, ThreadManager):
         self.model.removeRows(0, row_count)
         try:
             for music_info in data:
+                music_id = music_info.get("id")
                 cover_url = music_info.get("cover_url")
                 title = music_info.get("title")
                 author_data = music_info.get("owner")
                 author = author_data.get("username")
                 title_author = f"{title}\n{author}"
                 item = QtGui.QStandardItem(title_author)
+                item.setData(music_id)
                 icon = self.set_cover_to_music_in_list(cover_url)
                 item.setIcon(icon)
                 self.model.appendRow(item)
