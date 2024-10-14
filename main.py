@@ -4,7 +4,8 @@ from loguru import logger
 from PySide6 import QtWidgets
 
 from src.main.main_window import MainWindow
-from src.settings.settings import ini_settings
+from src.settings.config import ini_settings
+
 from src.settings.utils import set_up_static_dirs
 from src.tray.widget import TrayWidget
 
