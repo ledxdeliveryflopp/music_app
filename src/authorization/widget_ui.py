@@ -18,11 +18,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QFormLayout, QLabel, QLineEdit,
     QPushButton, QSizePolicy, QWidget)
 
+from src.registration.widget import RegistrationWidget
+
+
 class Ui_authorization_widget(object):
     def setupUi(self, authorization_widget):
         if not authorization_widget.objectName():
             authorization_widget.setObjectName(u"authorization_widget")
         authorization_widget.resize(506, 359)
+        self.registration_widget = RegistrationWidget(authorization_widget=authorization_widget)
         self.formLayout_2 = QFormLayout(authorization_widget)
         self.formLayout_2.setObjectName(u"formLayout_2")
         self.password_input = QLineEdit(authorization_widget)
@@ -44,7 +48,7 @@ class Ui_authorization_widget(object):
         self.error_label.setSizePolicy(sizePolicy)
         self.error_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.formLayout_2.setWidget(3, QFormLayout.FieldRole, self.error_label)
+        self.formLayout_2.setWidget(4, QFormLayout.FieldRole, self.error_label)
 
         self.send_button = QPushButton(authorization_widget)
         self.send_button.setObjectName(u"send_button")
@@ -60,9 +64,19 @@ class Ui_authorization_widget(object):
 
         self.formLayout_2.setWidget(2, QFormLayout.FieldRole, self.send_button)
 
+        self.registration_button = QPushButton(authorization_widget)
+        self.registration_button.setObjectName(u"registration_button")
+        sizePolicy1.setHeightForWidth(self.registration_button.sizePolicy().hasHeightForWidth())
+        self.registration_button.setSizePolicy(sizePolicy1)
+
+        self.formLayout_2.setWidget(3, QFormLayout.FieldRole, self.registration_button)
+
 
         self.send_button.setDefault(False)
 
 
         QMetaObject.connectSlotsByName(authorization_widget)
     # setupUi
+
+
+
