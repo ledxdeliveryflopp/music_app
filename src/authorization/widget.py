@@ -1,14 +1,12 @@
-import json
 import sys
 from datetime import datetime
 
 import httpx
 from PySide6 import QtWidgets
-from cryptography.fernet import Fernet
 from loguru import logger
 
 from src.authorization.widget_ui import Ui_authorization_widget
-from src.settings.settings import Settings, settings, ini_settings
+from src.settings.settings import ini_settings
 
 
 class AuthorizationWidget(QtWidgets.QWidget):
@@ -44,11 +42,7 @@ class AuthorizationWidget(QtWidgets.QWidget):
     def create_token_in_config(self, token: str, expire: datetime) -> None:
         """Создание токена в конфиге"""
         try:
-            krypt = Fernet(settings.crypt_settings.cryptography_token)
-            byte_token = token.encode("utf-8")
-            krypt_token = krypt.encrypt(byte_token)
-            str_krypt_token = krypt_token.decode("utf-8")
-            ini_settings.change_auth_section(str_krypt_token, expire)
+            ini_settings.change_auth_section(token, expire)
         except Exception as exception:
             logger.error(f"{self.create_token_in_config.__name__} error - {exception}")
 

@@ -14,7 +14,7 @@ from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 from loguru import logger
 
 from src.music.widget_ui import Ui_Music_widget
-from src.settings.settings import ini_settings, settings
+from src.settings.settings import ini_settings
 from src.settings.thread_manager import ThreadManager
 
 
@@ -143,8 +143,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         """Запрос к API"""
         try:
             token_from_ini = ini_settings.get_auth_token_section()
-            decrypted_token = settings.crypt_settings.decrypt_data(token_from_ini)
-            token = f"Bearer {decrypted_token}"
+            token = f"Bearer {token_from_ini}"
             response = httpx.get(
                 f"http://127.0.0.1:7000/music/play_music/?music_id={music_id}",
                 headers={f"Authorization": token}).json()

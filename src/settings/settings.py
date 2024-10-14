@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 
-from cryptography.fernet import Fernet
 from loguru import logger
 from pydantic_settings import BaseSettings
 
@@ -16,25 +15,14 @@ class ApiSettings(BaseSettings):
     api_url_login: str = f"{api_url}authorization"
 
 
-class CryptographySettings(BaseSettings):
-    cryptography_token: bytes = b'qSmEepLyjgfym-pJfVfR3UyTVSKtnUF6RDaDSUhOtuk='
-
-    def decrypt_data(self, data: bytes) -> str:
-        """расшифровать данные"""
-        f = Fernet(self.cryptography_token)
-        decrypted_data = f.decrypt(token=data).decode("utf-8")
-        return decrypted_data
-
-
 class Settings(BaseSettings):
 
     api_settings: ApiSettings
-    crypt_settings: CryptographySettings
 
 
 @lru_cache
 def init_settings() -> Settings:
-    return Settings(api_settings=ApiSettings(), crypt_settings=CryptographySettings())
+    return Settings(api_settings=ApiSettings())
 
 
 settings = init_settings()
@@ -82,10 +70,10 @@ class IniConfig:
         else:
             return False
 
-    def get_auth_token_section(self) -> bytes:
+    def get_auth_token_section(self) -> str:
         """Получить токен из ini"""
         self.config.read("config/config.ini")
-        token = self.config["AUTH"]["token"].encode()
+        token = self.config["AUTH"]["token"]
         return token
 
 
