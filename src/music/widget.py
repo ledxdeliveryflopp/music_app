@@ -14,7 +14,8 @@ from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
 from loguru import logger
 
 from src.music.widget_ui import Ui_Music_widget
-from src.settings.settings import ini_settings
+from src.settings.config import ini_settings
+
 from src.settings.thread_manager import ThreadManager
 
 

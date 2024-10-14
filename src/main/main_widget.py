@@ -2,7 +2,7 @@ from PySide6 import QtWidgets
 from loguru import logger
 
 from src.main.widget_ui import Ui_MainWindow
-from src.settings.settings import ini_settings
+from src.settings.config import ini_settings
 
 
 class MainWidget(QtWidgets.QWidget):
