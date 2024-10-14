@@ -1,18 +1,11 @@
-import configparser
-import os
-from dataclasses import dataclass
-from datetime import datetime
 from functools import lru_cache
 
-from loguru import logger
 from pydantic_settings import BaseSettings
 
 
 class ApiSettings(BaseSettings):
 
     api_url: str = "http://localhost:7000/"
-    api_url_registration: str = f"{api_url}registration"
-    api_url_login: str = f"{api_url}authorization"
 
 
 class Settings(BaseSettings):

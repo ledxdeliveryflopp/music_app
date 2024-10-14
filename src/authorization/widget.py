@@ -7,6 +7,7 @@ from loguru import logger
 
 from src.authorization.widget_ui import Ui_authorization_widget
 from src.settings.config import ini_settings
+from src.settings.settings import settings
 
 
 class AuthorizationWidget(QtWidgets.QWidget):
@@ -27,11 +28,13 @@ class AuthorizationWidget(QtWidgets.QWidget):
         """Установка текста"""
         self.ui.error_label.setText("")
         self.ui.send_button.setText(self.tr("send"))
+        self.ui.registration_button.setText(self.tr("Register"))
 
     @logger.catch
     def set_signals(self) -> None:
         """Установка сигналов"""
         self.ui.send_button.clicked.connect(self.authorization_request)
+        self.ui.registration_button.clicked.connect(self.open_registration_widget)
 
     @logger.catch
     def set_input_settings(self) -> None:
@@ -51,7 +54,7 @@ class AuthorizationWidget(QtWidgets.QWidget):
         """Запрос на эндопинт авторизации"""
         data = {"email": f"{self.ui.email_input.text()}",
                 "password": f"{self.ui.password_input.text()}"}
-        response = httpx.post("http://127.0.0.1:7000/authorization/login/", json=data)
+        response = httpx.post(f"{settings.api_settings.api_url}authorization/login/", json=data)
         response_json = response.json()
         if response.status_code == 200:
             token = response_json.get("token")
@@ -62,6 +65,11 @@ class AuthorizationWidget(QtWidgets.QWidget):
         else:
             logger.error(f"{self.authorization_request.__name__} json error - {response_json}")
             self.ui.error_label.setText("error")
+
+    @logger.catch
+    def open_registration_widget(self) -> None:
+        self.setEnabled(False)
+        self.ui.registration_widget.show()
 
     @logger.catch
     def closeEvent(self, event):

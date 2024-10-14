@@ -4,6 +4,8 @@ import urllib.request
 import httpx
 from loguru import logger
 
+from src.settings.settings import settings
+
 
 @logger.catch
 def set_up_static_dirs() -> None:
@@ -17,7 +19,7 @@ def set_up_static_dirs() -> None:
         print(icon_path)
         if path is False or icon_path is False:
             os.makedirs("static/images/tray", exist_ok=True)
-            response = httpx.get("http://127.0.0.1:7000/app/tray_icon/").json()
+            response = httpx.get(f"{settings.api_settings.api_url}app/tray_icon/").json()
             static_icon_url = response.get("icon")
             urllib.request.urlretrieve(static_icon_url, "static/images/tray/icon.png")
     except Exception as exception:

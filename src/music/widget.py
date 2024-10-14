@@ -15,6 +15,7 @@ from loguru import logger
 
 from src.music.widget_ui import Ui_Music_widget
 from src.settings.config import ini_settings
+from src.settings.settings import settings
 
 from src.settings.thread_manager import ThreadManager
 
@@ -52,7 +53,6 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.current_duration.setText("00:00")
         self.ui.stop_button.hide()
         self.ui.resume_button.hide()
-        logger.info(f"{self.translate_ui.__name__} - inited")
 
     @logger.catch
     def connect_sliders_etc(self) -> None:
@@ -65,7 +65,6 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
         self.ui.resume_button.clicked.connect(self.resume_music)
         self.ui.loop_button.setCheckable(True)
         self.ui.loop_button.clicked.connect(self.set_loop)
-        logger.info(f"{self.connect_sliders_etc.__name__} - inited")
 
     @logger.catch
     def set_loop(self) -> None:
@@ -146,7 +145,7 @@ class MusicWidget(QtWidgets.QWidget, ThreadManager):
             token_from_ini = ini_settings.get_auth_token_section()
             token = f"Bearer {token_from_ini}"
             response = httpx.get(
-                f"http://127.0.0.1:7000/music/play_music/?music_id={music_id}",
+                f"{settings.api_settings.api_url}music/play_music/?music_id={music_id}",
                 headers={f"Authorization": token}).json()
             file = response.get("file_url")
             duration = response.get("duration")

@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QAbstractItemView
 from loguru import logger
 
 from src.search.widget_ui import Ui_Search_widget
+from src.settings.settings import settings
 from src.settings.thread_manager import ThreadManager
 
 
@@ -56,7 +57,7 @@ class SearchWidget(QtWidgets.QWidget, ThreadManager):
         if len(self.ui.search_input.text()) < 4:
             return None
         try:
-            request = httpx.get(f"http://127.0.0.1:7000/music/find_music/?author_username="
+            request = httpx.get(f"{settings.api_settings.api_url}/music/find_music/?author_username="
                                 f"{query}&music_title={query}")
             request_data = request.json()
             return request_data
