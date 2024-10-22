@@ -58,9 +58,8 @@ class AuthorizationWidget(QtWidgets.QWidget):
         response_json = response.json()
         if response.status_code == 200:
             token = response_json.get("token")
-            expire = response_json.get("expire")
             self.status = True
-            self.create_token_in_config(token, expire)
+            self.create_token_in_config(token)
             self.close()
         else:
             logger.error(f"{self.authorization_request.__name__} json error - {response_json}")

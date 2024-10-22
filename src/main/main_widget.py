@@ -33,9 +33,12 @@ class MainWidget(QtWidgets.QWidget):
     def check_authorization(self) -> None:
         """Проверка авторизации"""
         token_in_config = ini_settings.check_auth_token_section()
-        response = self.check_token_response(token_in_config)
-        if response is True:
-            pass
+        if token_in_config is True:
+            response = self.check_token_response(token_in_config)
+            if response is True:
+                pass
+            else:
+                self.open_authorization_widget()
         else:
             self.open_authorization_widget()
 

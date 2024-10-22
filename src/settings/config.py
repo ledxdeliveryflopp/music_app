@@ -15,16 +15,16 @@ class IniConfig:
         """Создание базового конфига"""
         path = os.path.exists("config/config.ini")
         if path is False:
-            self.config["AUTH"] = {"token": "", "expire": ""}
+            self.config["AUTH"] = {"token": ""}
             self.config["LANG"] = {"code": "en_EN"}
             with open("config/config.ini", "w") as file:
                 self.config.write(file)
             logger.info(f"base ini created")
 
-    def change_auth_section(self, token: bytes, expire: datetime) -> None:
+    def change_auth_section(self, token: str) -> None:
         """Изменение секции auth"""
         path = os.path.exists("config/config.ini")
-        self.config["AUTH"] = {"token": token, "expire": expire}
+        self.config["AUTH"] = {"token": token}
         self.config["LANG"] = {"code": "en_EN"}
         if path is False:
             self.set_base_ini_config()
@@ -46,6 +46,7 @@ class IniConfig:
             else:
                 return False
         else:
+            self.set_base_ini_config()
             return False
 
     def get_auth_token_section(self) -> str:

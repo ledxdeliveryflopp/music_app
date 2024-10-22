@@ -16,7 +16,6 @@ def set_up_static_dirs() -> None:
         os.makedirs("static/images", exist_ok=True)
         path = os.path.exists("static/images/tray")
         icon_path = os.path.exists("static/images/tray/icon.png")
-        print(icon_path)
         if path is False or icon_path is False:
             os.makedirs("static/images/tray", exist_ok=True)
             response = httpx.get(f"{settings.api_settings.api_url}app/tray_icon/").json()
@@ -24,3 +23,4 @@ def set_up_static_dirs() -> None:
             urllib.request.urlretrieve(static_icon_url, "static/images/tray/icon.png")
     except Exception as exception:
         logger.info(f"{set_up_static_dirs.__name__} - {exception}")
+
