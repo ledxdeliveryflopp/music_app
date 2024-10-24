@@ -20,11 +20,9 @@ class MainWidget(QtWidgets.QWidget):
     def check_token_response(self, token: str) -> bool:
         """Запрос на эндопинт проверки токена"""
         try:
-            response = httpx.post(f"{settings.api_settings.api_url}check_token/?token={token}")
+            response = httpx.post(f"{settings.api_settings.api_url}authorization/check_token/?token={token}")
             if response.status_code == 200:
-                response_json = response.json()
-                data = response_json.get("detail")
-                return data
+                return True
         except Exception as e:
             logger.error(f"{self.check_token_response.__name__} error - {e}")
             return False
@@ -34,7 +32,8 @@ class MainWidget(QtWidgets.QWidget):
         """Проверка авторизации"""
         token_in_config = ini_settings.check_auth_token_section()
         if token_in_config is True:
-            response = self.check_token_response(token_in_config)
+            token = ini_settings.get_auth_token_section()
+            response = self.check_token_response(token)
             if response is True:
                 pass
             else:

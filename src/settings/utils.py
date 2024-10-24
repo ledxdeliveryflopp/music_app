@@ -24,3 +24,4 @@ def set_up_static_dirs() -> None:
     except Exception as exception:
         logger.info(f"{set_up_static_dirs.__name__} - {exception}")
 
+

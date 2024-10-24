@@ -57,7 +57,7 @@ class SearchWidget(QtWidgets.QWidget, ThreadManager):
         if len(self.ui.search_input.text()) < 4:
             return None
         try:
-            request = httpx.get(f"{settings.api_settings.api_url}/music/find_music/?author_username="
+            request = httpx.get(f"{settings.api_settings.api_url}music/find_music/?author_username="
                                 f"{query}&music_title={query}")
             request_data = request.json()
             return request_data

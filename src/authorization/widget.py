@@ -42,10 +42,10 @@ class AuthorizationWidget(QtWidgets.QWidget):
         self.ui.password_input.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
 
     @logger.catch
-    def create_token_in_config(self, token: str, expire: datetime) -> None:
+    def create_token_in_config(self, token: str) -> None:
         """Создание токена в конфиге"""
         try:
-            ini_settings.change_auth_section(token, expire)
+            ini_settings.change_auth_section(token)
         except Exception as exception:
             logger.error(f"{self.create_token_in_config.__name__} error - {exception}")
 
